@@ -7,7 +7,7 @@
     html, body {
       margin: 0;
       height: 100%;
-      background: transparent;
+      background: black;
       overflow: hidden;
       display: flex;
       justify-content: center;
@@ -21,17 +21,20 @@
     #spinBtn {
       position: absolute;
       bottom: 50px;
-      padding: 12px 24px;
-      font-size: 18px;
+      padding: 16px 32px;
+      font-size: 24px;
       border: none;
       border-radius: 10px;
       cursor: pointer;
+      background-color: white;
+      color: black;
+      font-weight: bold;
     }
 
     #result {
       position: absolute;
-      top: 20px;
-      font-size: 24px;
+      top: 30px;
+      font-size: 36px;
       font-weight: bold;
       color: white;
     }
@@ -71,7 +74,7 @@
         ctx.rotate(startAngle + arcSize / 2);
         ctx.textAlign = "right";
         ctx.fillStyle = "white";
-        ctx.font = "20px sans-serif";
+        ctx.font = "28px sans-serif";
         ctx.fillText(sectors[i].label, 220, 10);
         ctx.restore();
       }
