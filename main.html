@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Double or Lose Spinner</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      background: transparent;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #wheelCanvas {
+      background: transparent;
+    }
+
+    #spinBtn {
+      position: absolute;
+      bottom: 50px;
+      padding: 12px 24px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    #result {
+      position: absolute;
+      top: 20px;
+      font-size: 24px;
+      font-weight: bold;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="wheelCanvas" width="500" height="500"></canvas>
+  <div id="result"></div>
+  <button id="spinBtn">Spin</button>
+
+  <script>
+    const canvas = document.getElementById("wheelCanvas");
+    const ctx = canvas.getContext("2d");
+    const sectors = [
+      { label: "Double", color: "#2ecc71" },
+      { label: "Lose", color: "#e74c3c" }
+    ];
+    const totalSectors = sectors.length;
+    const arcSize = 2 * Math.PI / totalSectors;
+    let angle = 0;
+    let spinning = false;
+
+    function drawWheel() {
+      for (let i = 0; i < totalSectors; i++) {
+        const startAngle = angle + i * arcSize;
+        const endAngle = startAngle + arcSize;
+
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, canvas.height / 2);
+        ctx.arc(canvas.width / 2, canvas.height / 2, 240, startAngle, endAngle);
+        ctx.fillStyle = sectors[i].color;
+        ctx.fill();
+        ctx.save();
+
+        // Label
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate(startAngle + arcSize / 2);
+        ctx.textAlign = "right";
+        ctx.fillStyle = "white";
+        ctx.font = "20px sans-serif";
+        ctx.fillText(sectors[i].label, 220, 10);
+        ctx.restore();
+      }
+
+      // Indicator arrow
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 2 - 10, 10);
+      ctx.lineTo(canvas.width / 2 + 10, 10);
+      ctx.lineTo(canvas.width / 2, 40);
+      ctx.fillStyle = "white";
+      ctx.fill();
+    }
+
+    function spinWheel() {
+      if (spinning) return;
+      spinning = true;
+      let spinAngle = Math.random() * 360 + 720; // Two full spins minimum
+      let duration = 3000;
+      let start = null;
+
+      function animate(timestamp) {
+        if (!start) start = timestamp;
+        let progress = timestamp - start;
+        let eased = easeOutCubic(progress / duration);
+        angle = ((spinAngle * eased) * Math.PI / 180) % (2 * Math.PI);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawWheel();
+
+        if (progress < duration) {
+          requestAnimationFrame(animate);
+        } else {
+          spinning = false;
+          let resultIndex = totalSectors - Math.floor((angle % (2 * Math.PI)) / arcSize) - 1;
+          document.getElementById("result").textContent = "Result: " + sectors[resultIndex].label;
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    function easeOutCubic(t) {
+      return (--t) * t * t + 1;
+    }
+
+    drawWheel();
+    document.getElementById("spinBtn").addEventListener("click", spinWheel);
+  </script>
+</body>
+</html>
